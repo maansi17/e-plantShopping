@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { addItem } from './CartSlice'; 
 import './ProductList.css';
 import CartItem from './CartItem';
@@ -8,6 +8,8 @@ function ProductList() {
     const [showCart, setShowCart] = useState(false);
     const [addedToCart, setAddedToCart] = useState({}); // State to track added products
     const dispatch = useDispatch();
+    const cart = useSelector(state => state.cart.items);
+    
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -254,9 +256,15 @@ const handlePlantsClick = (e) => {
     dispatch(addItem(plant)); // Dispatch the addItem action to Redux
     setAddedToCart(prevState => ({ ...prevState, [plant.name]: true })); // Update the local state
   };
+
+  const getQuantity = (name) => {
+    const item = cart.find(item => item.name === name);
+    return item ? item.quantity : 0;
+  };
+
     return (
         <div>
-             <div className="navbar" style={styleObj}>
+            <div className="navbar" style={styleObj}>
             <div className="tag">
                <div className="luxury">
                <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
@@ -288,32 +296,34 @@ const handlePlantsClick = (e) => {
             </div>
         </div>
         {!showCart ? (
-        <div className="product-grid">
-            {plantsArray.map((category, index) => (
-            <div key={index}>
-                <h1><div>{category.category}</div></h1>
-                <div className="product-list">
-                    {category.plants.map((plant, plantIndex) => (
-                    <div className="product-card" key={plantIndex}>
-                        <div className="product-title">{plant.name}</div>
-                        <img className="product-image" src={plant.image} alt={plant.name} />
-                        <div className="product-description">{plant.description}</div>
-                        <div className="product-cost">{plant.cost}</div>
-                        <button className="product-button" onClick={() => handleAddToCart(plant)}>
-                            {addedToCart[plant.name] ? 'Added' : 'Add to Cart'}
-                        </button>
+                <div className="product-grid">
+                    {plantsArray.map((category, index) => (
+                        <div key={index}>
+                            <h1><div>{category.category}</div></h1>
+                            <div className="product-list">
+                                {category.plants.map((plant, plantIndex) => (
+                                    <div className="product-card" key={plantIndex}>
+                                        <div className="product-title">{plant.name}</div>
+                                        <img className="product-image" src={plant.image} alt={plant.name} />
+                                        <div className="product-description">{plant.description}</div>
+                                        <div className="product-cost">{plant.cost}</div>
+                                        <div>Quantity in Cart: {getQuantity(plant.name)}</div> {/* Highlighted line */}
+                                        <button className="product-button" onClick={() => handleAddToCart(plant)}>
+                                            {addedToCart[plant.name] ? 'Added' : 'Add to Cart'}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     ))}
-                    </div>
-                    </div>
-                ))}
-                </div>
-                ) : (
+            </div>
+            ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
-                )}
-                </div>
-                );
-            }
+            )}
+        </div>
+    );
+}
+
 export default ProductList;
 
 
