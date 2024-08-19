@@ -314,4 +314,6 @@ const handlePlantsClick = (e) => {
                 </div>
                 );
             }
-export default ProductList
+export default ProductList;
+
+
